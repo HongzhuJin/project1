@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Live Birth in China</title>
+  <style>
+    body {
+      background-color: rgb(245, 221, 213);
+      margin: 0;
+      padding: 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+    }
+    .header {
+      display: flex;
+      align-items: center;
+      width: 93%; 
+      margin-bottom: 20px; 
+    }
+    .vertical-line {
+      width: 15px;
+      background-color: rgb(238, 191, 191);
+      margin-right: 10px;
+      align-self: stretch; 
+    }
+    .header-text {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+    }
+    .title {
+      text-align: left; 
+      font-size: 30px; 
+      font-weight: bold;
+      font-family: Arial, Helvetica, sans-serif; 
+      color: rgb(27, 25, 25); 
+      margin: 0; 
+    }
+    .subtitle {
+      text-align: left;
+      font-size: 25px;
+      font-family: Arial, Helvetica, sans-serif;
+      font-weight: bold;
+      color: darkred;
+      margin: 2px 0 0 0; 
+    }
+    .legend {
+      display: flex;
+      gap: 20px;
+      width: 93%;
+      margin-bottom: 30px; 
+      justify-content: center; 
+    }
+    .legend-item {
+      display: flex;
+      align-items: center;
+      gap: 5px;
+    }
+    .legend-color {
+      width: 30px;   
+      height: 10px;  
+    }
+    .legend-label {
+      font-size: 15px;
+      font-family: Arial, Helvetica, sans-serif;
+      color: rgb(27, 25, 25);
+    }
+    .chart {
+      display: flex;
+      align-items: flex-end;
+      justify-content: center;
+      width: 93%; 
+      margin: 0 auto;
+      gap: 3px; 
+      margin-bottom: 20px;
+    }
+    .bar {
+      width: 25px;
+      background-color: rgb(238, 191, 191); 
+      position: relative;
+      text-align: center;
+      transition: transform 0.2s, box-shadow 0.2s;
+    }
+    .bar-value {
+      display: none;
+      position: absolute;
+      top: -30px;
+      left: 50%;
+      transform: translateX(-50%);
+      font-size: 15px;
+      font-weight: bold;
+      font-family: Arial, Helvetica, sans-serif;
+      color: black;
+      z-index: 10;
+    }
+    .bar:hover .bar-value {
+      display: block;
+    }
+    .bar:hover {
+      transform: translateY(-5px) scale(1.05);
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    }
+    .bar span {
+      position: absolute;
+      bottom: -18px; 
+      left: 50%;
+      transform: translateX(-50%);
+      font-size: 10px;
+      font-weight: bold;
+      font-family: Arial, Helvetica, sans-serif;
+      display: flex;
+      align-items: center;
+    }
+    .icon {
+      font-size: 40px; 
+    }
+    .source {
+      width: 93%;
+      text-align: left;
+      font-size: 10px;
+      font-family: Arial, Helvetica, sans-serif;
+      color: rgb(107, 105, 105);
+      margin-top: 30px;
+    }
+    .group-gap {
+      width: 15px; 
+      flex: none;
+    }
+  </style>
+</head>
+<body>
+  <div class="header">
+    <div class="vertical-line"></div>
+    <div class="header-text">
+      <div class="title">ARE "DRAGON BABIES" CONTRIBUTING TO CHINA'S POPULATION GROWTH?</div>
+      <div class="subtitle">Live birth per million in China in the past 40 years (1984-2024)</div>
+    </div>
+  </div>
+  <div class="legend">
+    <div class="legend-item">
+      <div class="legend-color" style="background-color: rgb(139, 0, 0);"></div>
+      <div class="legend-label">Years of Dragon</div>
+    </div>
+    <div class="legend-item">
+      <div class="legend-color" style="background-color: rgb(238, 191, 191);"></div>
+      <div class="legend-label">Other Years</div>
+    </div>
+  </div>
+
+  <div class="chart" id="chart"></div>
+  <div class="source">Source: National Bureau of Statistics of China</div>
+
+  <script>
+    const years = [1984, 1985, 1986, 1987, 1988, 1989, 1990, 1991, 1992, 1993, 1994, 1995, 1996, 1997, 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010, 2011, 2012, 2013, 2014, 2015, 2016, 2017, 2018, 2019, 2020, 2021, 2022, 2023, 2024];
+    const birth = [20.63, 22.11, 23.93, 25.29, 24.64, 24.14, 23.91, 22.58, 21.19, 21.26, 21.04, 20.63, 20.67, 20.38, 19.42, 18.34, 17.71, 17.02, 16.47, 15.99, 15.93, 16.17, 15.84, 15.94, 16.08, 15.91, 15.92, 17.85, 19.73, 17.76, 18.92, 16.55, 18.83, 17.65, 15.23, 14.65, 12.02, 10.62, 9.56, 9.02, 9.54];
+    const dragonYears = [1988, 2000, 2012, 2024];
+    const yearToIcon = {
+      1984: '🐭', 1996: '🐭', 2008: '🐭', 2020: '🐭',
+      1985: '🐮', 1997: '🐮', 2009: '🐮', 2021: '🐮',
+      1986: '🐯', 1998: '🐯', 2010: '🐯', 2022: '🐯',
+      1987: '🐰', 1999: '🐰', 2011: '🐰', 2023: '🐰',
+      1988: '🐲', 2000: '🐲', 2012: '🐲', 2024: '🐲',
+      1989: '🐍', 2001: '🐍', 2013: '🐍',
+      1990: '🐴', 2002: '🐴', 2014: '🐴',
+      1991: '🐑', 2003: '🐑', 2015: '🐑',
+      1992: '🐵', 2004: '🐵', 2016: '🐵',
+      1993: '🐔', 2005: '🐔', 2017: '🐔',
+      1994: '🐶', 2006: '🐶', 2018: '🐶',
+      1995: '🐷', 2007: '🐷', 2019: '🐷'
+    };
+
+    const chart = document.getElementById('chart');
+
+    years.forEach((year, index) => {
+      const bar = document.createElement('div');
+      bar.className = 'bar';
+      bar.style.height = `${birth[index] * 15}px`;
+
+      if (dragonYears.includes(year)) {
+        bar.style.background = 'rgb(139, 0, 0)';
+      }
+
+      const valueElem = document.createElement('div');
+      valueElem.className = 'bar-value';
+      valueElem.textContent = birth[index];
+      bar.appendChild(valueElem);
+
+      const icon = yearToIcon[year] || '';
+      bar.innerHTML += `<span><span class="icon">${icon}</span><br>${year}</span>`;
+      chart.appendChild(bar);
+
+      if (year === 1995 || year === 2007 || year === 2019) {
+        const gapDiv = document.createElement('div');
+        gapDiv.className = 'group-gap';
+        chart.appendChild(gapDiv);
+      }
+    });
+  </script>
+</body>
+</html>
